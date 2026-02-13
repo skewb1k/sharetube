@@ -11,7 +11,7 @@ func main() {
 
 	srv := &http.Server{
 		Addr:    "0.0.0.0:9090",
-		Handler: mux,
+		Handler: loggingMiddleware(mux),
 	}
 
 	log.Printf("Listening on http://%s", srv.Addr)
