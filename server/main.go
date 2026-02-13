@@ -8,6 +8,8 @@ import (
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", handleHealthz)
+	mux.HandleFunc("POST /room", handleCreateRoom)
+	mux.HandleFunc("POST /room/{roomID}", handleJoinRoom)
 
 	srv := &http.Server{
 		Addr:    "0.0.0.0:9090",
