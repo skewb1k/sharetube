@@ -1,0 +1,44 @@
+name: Extension CI
+
+on:
+  push:
+    paths:
+      - .github/workflows/**
+      - extension/**
+
+defaults:
+  run:
+    working-directory: ./extension
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          cache: npm
+          cache-dependency-path: extension/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Run 'lint' script
+        run: npm run lint
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          cache: npm
+          cache-dependency-path: extension/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
