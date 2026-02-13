@@ -1,0 +1,13 @@
+{
+  "name": "sharetube-extension",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && node build.js",
+    "lint": "prettier --check .",
+    "fmt": "prettier --write ."
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "prettier": "^3"
+  }
+}

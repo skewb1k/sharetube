@@ -1,0 +1,11 @@
+{
+  "name": "Sharetube",
+  "version": "0.0.0",
+  "manifest_version": 3,
+  "content_scripts": [
+    {
+      "js": ["content-script/index.js"],
+      "matches": ["https://*.youtube.com/*"]
+    }
+  ]
+}
