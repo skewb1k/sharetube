@@ -7,7 +7,8 @@
     "fmt": "prettier --write ."
   },
   "devDependencies": {
-    "typescript": "^5",
-    "prettier": "^3"
+    "chrome-types": "^0.1",
+    "prettier": "^3",
+    "typescript": "^5"
   }
 }

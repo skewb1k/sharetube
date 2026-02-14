@@ -1,7 +1,11 @@
 {
+  "manifest_version": 3,
   "name": "Sharetube",
   "version": "0.0.0",
-  "manifest_version": 3,
+  "background": {
+    "service_worker": "background-script/index.js"
+  },
+  "host_permissions": ["http://localhost:9090/*"],
   "content_scripts": [
     {
       "js": ["content-script/index.js"],
