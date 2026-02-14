@@ -2,10 +2,26 @@ package main
 
 import (
 	"sync"
+
+	"github.com/gorilla/websocket"
 )
 
 type User struct {
-	Name string `json:"name"`
+	mu   sync.RWMutex
+	Name string          `json:"name"`
+	Conn *websocket.Conn `json:"-"`
+}
+
+func (u *User) SetConn(conn *websocket.Conn) {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	u.Conn = conn
+}
+
+func (u *User) GetConn() *websocket.Conn {
+	u.mu.RLock()
+	defer u.mu.RUnlock()
+	return u.Conn
 }
 
 type Room struct {
@@ -20,6 +36,18 @@ func (r *Room) AddUser(user *User) int {
 	idx := len(r.Users)
 	r.Users = append(r.Users, user)
 	return idx
+}
+
+func (r *Room) GetUser(userID int) *User {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.Users[userID]
+}
+
+func (r *Room) GetUsers() []*User {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.Users
 }
 
 type RoomStore struct {

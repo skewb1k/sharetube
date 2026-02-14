@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"log"
+	"net"
 	"net/http"
 	"time"
 )
@@ -34,4 +36,13 @@ type statusCodeResponseWriter struct {
 func (rw *statusCodeResponseWriter) WriteHeader(statusCode int) {
 	rw.statusCode = statusCode
 	rw.ResponseWriter.WriteHeader(statusCode)
+}
+
+// Implement [http.Hijacker] for WebSocket upgrader.
+func (rw *statusCodeResponseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	h, ok := rw.ResponseWriter.(http.Hijacker)
+	if !ok {
+		panic("statusCodeResponseWriter does not implement http.Hijacker")
+	}
+	return h.Hijack()
 }

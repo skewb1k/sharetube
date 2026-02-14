@@ -10,6 +10,7 @@ func main() {
 	mux.HandleFunc("/healthz", handleHealthz)
 	mux.HandleFunc("POST /room", handleCreateRoom)
 	mux.HandleFunc("POST /room/{roomID}", handleJoinRoom)
+	mux.HandleFunc("GET /room/{roomID}/connect", handleConnectRoom)
 
 	srv := &http.Server{
 		Addr:    "0.0.0.0:9090",
