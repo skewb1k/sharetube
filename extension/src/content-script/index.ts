@@ -1,11 +1,3 @@
-async function createRoom(): Promise<string> {
-  const response = await fetch("$ST_HOST/room", {
-    method: "POST",
-  });
-  const roomId = response.text();
-  return roomId;
-}
-
 const createRoomButtonContainer = document.querySelector("#end");
 if (createRoomButtonContainer === null)
   throw new Error("createRoom button container not found");
@@ -16,6 +8,9 @@ createRoomButton.textContent = "Create Room";
 createRoomButton.addEventListener("click", async () => {
   const roomId = await createRoom();
   console.log(roomId);
+  const joinRoomResp = await joinRoom(roomId);
+  console.log(joinRoomResp);
+  connectRoom(joinRoomResp.user_id, roomId);
 });
 
 createRoomButtonContainer.prepend(createRoomButton);

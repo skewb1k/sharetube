@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "content_scripts": [
     {
-      "js": ["content-script/index.js"],
+      "js": ["content-script/index.js", "content-script/client.js"],
       "matches": ["https://*.youtube.com/*"]
     }
   ]
