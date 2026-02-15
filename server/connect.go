@@ -21,7 +21,7 @@ func handleConnectRoom(w http.ResponseWriter, r *http.Request) {
 	userIDParam := r.URL.Query().Get("uid")
 	userID, err := strconv.Atoi(userIDParam)
 	if err != nil {
-		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		http.Error(w, "Invalid user ID: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -33,7 +33,7 @@ func handleConnectRoom(w http.ResponseWriter, r *http.Request) {
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		http.Error(w, "Failed to upgrade connection"+err.Error(), http.StatusBadRequest)
+		http.Error(w, "Failed to upgrade connection: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 	defer conn.Close()
