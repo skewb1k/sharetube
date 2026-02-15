@@ -8,7 +8,12 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{}
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		// TODO(skewb1k): validate Origin.
+		return true
+	},
+}
 
 func handleConnectRoom(w http.ResponseWriter, r *http.Request) {
 	roomID := r.PathValue("roomID")
