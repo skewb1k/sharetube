@@ -12,6 +12,7 @@ var roomStore = NewRoomStore()
 
 func newRoomID() string {
 	b := make([]byte, 4)
+	// crypto/rand.Read() never returns an error.
 	_, _ = rand.Read(b)
 	return hex.EncodeToString(b)
 }
@@ -54,5 +55,8 @@ func handleJoinRoom(w http.ResponseWriter, r *http.Request) {
 		Room:   room,
 	}
 	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(resp)
+	err := json.NewEncoder(w).Encode(resp)
+	if err != nil {
+		panic(err)
+	}
 }
