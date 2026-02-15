@@ -2,10 +2,6 @@
   "manifest_version": 3,
   "name": "ShareTube",
   "version": "0.0.0",
-  "background": {
-    "service_worker": "background-script/index.js"
-  },
-  "host_permissions": ["$ST_HOST/*"],
   "content_scripts": [
     {
       "js": ["content-script/index.js"],

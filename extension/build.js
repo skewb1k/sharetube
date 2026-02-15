@@ -8,7 +8,7 @@ let manifest = readFileSync("src/manifest.json", "utf-8");
 manifest = manifest.replaceAll(HOST_REGEX, HOST);
 writeFileSync("dist/manifest.json", manifest);
 
-const bgScriptPath = "dist/background-script/index.js";
-let bgScript = readFileSync(bgScriptPath, "utf-8");
-bgScript = bgScript.replaceAll(HOST_REGEX, HOST);
-writeFileSync(bgScriptPath, bgScript);
+const contentScriptPath = "dist/content-script/index.js";
+let contentScript = readFileSync(contentScriptPath, "utf-8");
+contentScript = contentScript.replaceAll(HOST_REGEX, HOST);
+writeFileSync(contentScriptPath, contentScript);
