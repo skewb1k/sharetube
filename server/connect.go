@@ -18,12 +18,8 @@ func handleConnectRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userIDCookie, err := r.Cookie(USER_ID_COOKIE)
-	if err != nil {
-		http.Error(w, "Missing 'st_user_id' cookie", http.StatusBadRequest)
-		return
-	}
-	userID, err := strconv.Atoi(userIDCookie.Value)
+	userIDParam := r.URL.Query().Get("uid")
+	userID, err := strconv.Atoi(userIDParam)
 	if err != nil {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
 		return

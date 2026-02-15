@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"maps"
@@ -27,23 +28,23 @@ func TestConnect(t *testing.T) {
 		t.Fatalf("createRoom: %v", err)
 	}
 
-	header1, err := joinRoom(&client, roomID)
+	userID1, err := joinRoom(&client, roomID)
 	if err != nil {
 		t.Fatalf("joinRoom user1: %v", err)
 	}
 
-	conn1, err := connect(roomID, header1)
+	conn1, err := connect(roomID, userID1)
 	if err != nil {
 		t.Fatalf("connect user1: %v", err)
 	}
 	defer conn1.Close()
 
-	header2, err := joinRoom(&client, roomID)
+	userID2, err := joinRoom(&client, roomID)
 	if err != nil {
 		t.Fatalf("joinRoom user2: %v", err)
 	}
 
-	conn2, err := connect(roomID, header2)
+	conn2, err := connect(roomID, userID2)
 	if err != nil {
 		t.Fatalf("connect user2: %v", err)
 	}
@@ -105,37 +106,39 @@ func createRoom(client *http.Client) (string, error) {
 	return string(roomIDBytes), nil
 }
 
-func joinRoom(client *http.Client, roomID string) (http.Header, error) {
+func joinRoom(client *http.Client, roomID string) (int, error) {
 	url := "http://" + HOST + "/room/" + roomID
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
-		return nil, fmt.Errorf("request build: %w", err)
+		return 0, fmt.Errorf("request build: %w", err)
 	}
 	res, err := client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("request do: %w", err)
+		return 0, fmt.Errorf("request do: %w", err)
 	}
 	defer res.Body.Close()
 
 	// TODO(skewb1k): assert res.Body.
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status: %s", res.Status)
+		return 0, fmt.Errorf("unexpected status: %s", res.Status)
 	}
 
-	setCookie := res.Header.Get("Set-Cookie")
-	if setCookie == "" {
-		return nil, fmt.Errorf("missing Set-Cookie")
+	var resp struct {
+		UserID int `json:"user_id"`
 	}
-	header := http.Header{}
-	header.Set("Cookie", setCookie)
-	return header, nil
+	err = json.NewDecoder(res.Body).Decode(&resp)
+	if err != nil {
+		return 0, fmt.Errorf("decode body: %w", err)
+	}
+
+	return resp.UserID, nil
 }
 
-func connect(roomID string, header http.Header) (*websocket.Conn, error) {
-	wsURL := "ws://" + HOST + "/room/" + roomID + "/connect"
+func connect(roomID string, userID int) (*websocket.Conn, error) {
+	wsURL := fmt.Sprintf("ws://%s/room/%s/connect?uid=%d", HOST, roomID, userID)
 	dialer := websocket.Dialer{}
-	conn, _, err := dialer.Dial(wsURL, header)
+	conn, _, err := dialer.Dial(wsURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("websocket dial failed: %w", err)
 	}
