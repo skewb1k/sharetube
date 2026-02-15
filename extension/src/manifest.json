@@ -5,7 +5,7 @@
   "background": {
     "service_worker": "background-script/index.js"
   },
-  "host_permissions": ["http://localhost:9090/*"],
+  "host_permissions": ["$ST_HOST/*"],
   "content_scripts": [
     {
       "js": ["content-script/index.js"],

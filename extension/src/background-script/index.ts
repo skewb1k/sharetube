@@ -1,5 +1,5 @@
 async function createRoom(): Promise<string> {
-  const response = await fetch("http://localhost:9090/room", {
+  const response = await fetch("$ST_HOST/room", {
     method: "POST",
   });
   const roomId = response.text();
