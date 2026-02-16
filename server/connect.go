@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
@@ -52,9 +53,14 @@ func handleConnectRoom(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			break
 		}
-		broadcast(room, conn, msg)
+		users := room.GetUsers()
 
-		err = conn.WriteJSON(msg)
+		msgBytes, err := json.Marshal(msg)
+		if err != nil {
+			break
+		}
+		broadcast(users, conn, msgBytes)
+		err = conn.WriteMessage(websocket.TextMessage, msgBytes)
 		if err != nil {
 			log.Printf("Failed to write: %s", err.Error())
 			break
@@ -62,16 +68,16 @@ func handleConnectRoom(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func broadcast(room *Room, senderConn *websocket.Conn, msg any) {
-	users := room.GetUsers()
-	for _, u := range users {
-		conn := u.GetConn()
+func broadcast(users []*User, senderConn *websocket.Conn, msg []byte) {
+	for _, user := range users {
+		conn := user.GetConn()
 		if conn == nil || conn == senderConn {
 			continue
 		}
 
 		go func(c *websocket.Conn) {
-			if err := c.WriteJSON(msg); err != nil {
+			err := c.WriteMessage(websocket.TextMessage, msg)
+			if err != nil {
 				log.Printf("broadcast write error: %v", err)
 				c.Close()
 			}

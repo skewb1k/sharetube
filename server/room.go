@@ -56,9 +56,26 @@ func handleJoinRoom(w http.ResponseWriter, r *http.Request) {
 		// TODO(skewb1k): generate unique username.
 		username = "User1"
 	}
+
 	user := &User{
 		Name: username,
 	}
+
+	users := room.GetUsers()
+
+	notification := &Notification{
+		Tag: NotificationTagUserJoined,
+		Data: UserJoinedNotification{
+			JoinedUser: user,
+			Users:      users,
+		},
+	}
+	notificationBytes, err := json.Marshal(notification)
+	if err != nil {
+		panic(err)
+	}
+	broadcast(users, nil, notificationBytes)
+
 	userID := room.AddUser(user)
 
 	_, _ = io.WriteString(w, strconv.Itoa(userID))
