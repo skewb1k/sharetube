@@ -55,7 +55,6 @@ async function handleStoredRoomId(roomId: string): Promise<void> {
   if (userId === null) {
     throw new Error("Found stored room ID but missing corresponding user ID");
   }
-  setRoomURL(roomId);
 
   let room: Room;
   try {
@@ -64,12 +63,13 @@ async function handleStoredRoomId(roomId: string): Promise<void> {
     localStorage.removeItem(STORAGE_KEY_ROOM_ID);
     localStorage.removeItem(STORAGE_KEY_USER_ID);
     console.log(
-      "Failed to get room for stored ID %s: %o; storage cleaned",
+      "Failed to get room for stored ID %s; storage cleaned: %o",
       roomId,
       err,
     );
     return;
   }
+  setRoomURL(roomId);
   console.log("Fetched room info for %s: %o", roomId, room);
   connectRoom(userId, roomId);
 }
