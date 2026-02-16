@@ -50,26 +50,42 @@ async function handleRoomURL(roomId: string): Promise<void> {
   window.location.href = "/";
 }
 
+async function handleStoredRoomId(roomId: string): Promise<void> {
+  const userId = localStorage.getItem(STORAGE_KEY_USER_ID);
+  if (userId === null) {
+    throw new Error("Found stored room ID but missing corresponding user ID");
+  }
+  setRoomURL(roomId);
+
+  let room: Room;
+  try {
+    room = await getRoom(roomId);
+  } catch (err) {
+    localStorage.removeItem(STORAGE_KEY_ROOM_ID);
+    localStorage.removeItem(STORAGE_KEY_USER_ID);
+    console.log(
+      "Failed to get room for stored ID %s: %o; storage cleaned",
+      roomId,
+      err,
+    );
+    return;
+  }
+  console.log("Fetched room info for %s: %o", roomId, room);
+  connectRoom(userId, roomId);
+}
+
 (async () => {
   console.log("Current URL:", location.href);
   const roomId = parseRoomURL(location.href);
   if (roomId !== null) {
     console.log("Room URL detected, room ID: %s", roomId);
     handleRoomURL(roomId);
-    return;
   }
 
   const storedRoomId = localStorage.getItem(STORAGE_KEY_ROOM_ID);
   if (storedRoomId !== null) {
     console.log("Found stored room ID: %s", storedRoomId);
-    const userId = localStorage.getItem(STORAGE_KEY_USER_ID);
-    if (userId === null) {
-      throw new Error("Found stored room ID but missing corresponding user ID");
-    }
-    setRoomURL(storedRoomId);
-    const room = await getRoom(storedRoomId);
-    console.log("Fetched room info for %s: %o", storedRoomId, room);
-    connectRoom(userId, storedRoomId);
+    handleStoredRoomId(storedRoomId);
   }
 
   const createRoomButtonContainer = document.querySelector("#end");
