@@ -28,6 +28,11 @@ func TestConnect(t *testing.T) {
 		t.Fatalf("createRoom: %v", err)
 	}
 
+	err = getRoom(&client, roomID)
+	if err != nil {
+		t.Fatalf("getRoom: %v", err)
+	}
+
 	userID1, err := joinRoom(&client, roomID)
 	if err != nil {
 		t.Fatalf("joinRoom user1: %v", err)
@@ -143,4 +148,21 @@ func connect(roomID string, userID int) (*websocket.Conn, error) {
 		return nil, fmt.Errorf("websocket dial failed: %w", err)
 	}
 	return conn, nil
+}
+
+func getRoom(client *http.Client, roomID string) error {
+	url := "http://" + HOST + "/room/" + roomID
+	res, err := client.Get(url)
+	if err != nil {
+		return fmt.Errorf("get: %w", err)
+	}
+	defer res.Body.Close()
+
+	// TODO(skewb1k): assert res.Body.
+
+	if res.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status: %s", res.Status)
+	}
+
+	return nil
 }

@@ -27,6 +27,21 @@ func handleCreateRoom(w http.ResponseWriter, r *http.Request) {
 	_, _ = io.WriteString(w, roomID)
 }
 
+func handleGetRoom(w http.ResponseWriter, r *http.Request) {
+	roomID := r.PathValue("roomID")
+	room := roomStore.GetRoom(roomID)
+	if room == nil {
+		http.Error(w, "Room not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err := json.NewEncoder(w).Encode(room)
+	if err != nil {
+		panic(err)
+	}
+}
+
 type joinRoomResp struct {
 	UserID int   `json:"user_id"`
 	Room   *Room `json:"room"`
