@@ -10,8 +10,14 @@ async function createRoom(): Promise<string> {
   const response = await fetch("$ST_HOST/room", {
     method: "POST",
   });
-  const roomId = response.text();
+  const roomId = await response.text();
   return roomId;
+}
+
+async function getRoom(roomId: string): Promise<Room> {
+  const response = await fetch(`$ST_HOST/room/${roomId}`);
+  const room = await response.json();
+  return room;
 }
 
 async function joinRoom(roomId: string): Promise<string> {
