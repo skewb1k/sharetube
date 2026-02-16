@@ -75,12 +75,11 @@ func broadcast(users []*User, senderConn *websocket.Conn, msg []byte) {
 			continue
 		}
 
-		go func(c *websocket.Conn) {
-			err := c.WriteMessage(websocket.TextMessage, msg)
-			if err != nil {
-				log.Printf("broadcast write error: %v", err)
-				c.Close()
-			}
-		}(conn)
+		// TODO(skewb1k): use channel here to avoid blocking thread.
+		err := conn.WriteMessage(websocket.TextMessage, msg)
+		if err != nil {
+			log.Printf("broadcast write error: %v", err)
+			conn.Close()
+		}
 	}
 }
