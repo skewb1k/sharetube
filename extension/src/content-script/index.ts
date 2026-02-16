@@ -1,7 +1,8 @@
 const STORAGE_KEY_ROOM_ID = "st-room-id";
 const STORAGE_KEY_USER_ID = "st-user-id";
 
-function parseInviteURL(url: string): string | null {
+function parseRoomURL(url: string): string | null {
+  // TODO(skewb1k): consider validating roomId.
   const inviteMatch = url.match(/\/sharetube\/([^/?#]+)/);
   if (inviteMatch) {
     return inviteMatch[1];
@@ -32,7 +33,7 @@ async function handleCreateRoom(): Promise<void> {
   connectRoom(userId, roomId);
 }
 
-async function handleInvite(roomId: string): Promise<void> {
+async function handleRoomURL(roomId: string): Promise<void> {
   let userId: string;
   try {
     userId = await joinRoom(roomId);
@@ -51,24 +52,24 @@ async function handleInvite(roomId: string): Promise<void> {
 
 (async () => {
   console.log("Current URL:", location.href);
-  const inviteRoomId = parseInviteURL(location.href);
-  if (inviteRoomId !== null) {
-    console.log("Invite detected, room ID: %s", inviteRoomId);
-    handleInvite(inviteRoomId);
+  const roomId = parseRoomURL(location.href);
+  if (roomId !== null) {
+    console.log("Room URL detected, room ID: %s", roomId);
+    handleRoomURL(roomId);
     return;
   }
 
-  const roomId = localStorage.getItem(STORAGE_KEY_ROOM_ID);
-  if (roomId !== null) {
-    console.log("Found stored room ID: %s", roomId);
+  const storedRoomId = localStorage.getItem(STORAGE_KEY_ROOM_ID);
+  if (storedRoomId !== null) {
+    console.log("Found stored room ID: %s", storedRoomId);
     const userId = localStorage.getItem(STORAGE_KEY_USER_ID);
     if (userId === null) {
       throw new Error("Found stored room ID but missing corresponding user ID");
     }
-    setRoomURL(roomId);
-    const room = await getRoom(roomId);
-    console.log("Fetched room info for %s: %o", roomId, room);
-    connectRoom(userId, roomId);
+    setRoomURL(storedRoomId);
+    const room = await getRoom(storedRoomId);
+    console.log("Fetched room info for %s: %o", storedRoomId, room);
+    connectRoom(userId, storedRoomId);
   }
 
   const createRoomButtonContainer = document.querySelector("#end");
