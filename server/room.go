@@ -61,22 +61,26 @@ func handleJoinRoom(w http.ResponseWriter, r *http.Request) {
 		Name: username,
 	}
 
-	users := room.GetUsers()
+	room.Mu.RLock()
 
 	notification := &Notification{
 		Tag: NotificationTagUserJoined,
 		Data: UserJoinedNotification{
 			JoinedUser: user,
-			Users:      users,
+			Users:      room.Users,
 		},
 	}
 	notificationBytes, err := json.Marshal(notification)
 	if err != nil {
 		panic(err)
 	}
-	broadcast(users, nil, notificationBytes)
+	broadcast(room, nil, notificationBytes)
+	room.Mu.RUnlock()
 
-	userID := room.AddUser(user)
+	room.Mu.Lock()
+	userID := len(room.Users)
+	room.Users = append(room.Users, user)
+	room.Mu.Unlock()
 
 	_, _ = io.WriteString(w, strconv.Itoa(userID))
 }

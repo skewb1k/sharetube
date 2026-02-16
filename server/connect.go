@@ -44,8 +44,9 @@ func handleConnectRoom(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Close()
 
-	user.SetConn(conn)
-	defer user.SetConn(nil)
+	room.Mu.Lock()
+	user.Conn = conn
+	room.Mu.Unlock()
 
 	for {
 		var msg any
@@ -53,24 +54,32 @@ func handleConnectRoom(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			break
 		}
-		users := room.GetUsers()
-
 		msgBytes, err := json.Marshal(msg)
 		if err != nil {
 			break
 		}
-		broadcast(users, conn, msgBytes)
+
+		room.Mu.RLock()
+		broadcast(room, conn, msgBytes)
+		room.Mu.RUnlock()
+
 		err = conn.WriteMessage(websocket.TextMessage, msgBytes)
 		if err != nil {
 			log.Printf("Failed to write: %s", err.Error())
 			break
 		}
 	}
+
+	room.Mu.Lock()
+	user.Conn = nil
+	room.Mu.Unlock()
 }
 
-func broadcast(users []*User, senderConn *websocket.Conn, msg []byte) {
-	for _, user := range users {
-		conn := user.GetConn()
+// This function does not acquire or release the room lock.
+// Callers are responsible for locking.
+func broadcast(room *Room, senderConn *websocket.Conn, msg []byte) {
+	for _, user := range room.Users {
+		conn := user.Conn
 		if conn == nil || conn == senderConn {
 			continue
 		}
