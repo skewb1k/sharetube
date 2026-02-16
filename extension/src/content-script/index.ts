@@ -8,9 +8,9 @@ createRoomButton.textContent = "Create Room";
 createRoomButton.addEventListener("click", async () => {
   const roomId = await createRoom();
   console.log(roomId);
-  const joinRoomResp = await joinRoom(roomId);
-  console.log(joinRoomResp);
-  connectRoom(joinRoomResp.user_id, roomId);
+  const userId = await joinRoom(roomId);
+  console.log(userId);
+  connectRoom(userId, roomId);
 });
 
 createRoomButtonContainer.prepend(createRoomButton);

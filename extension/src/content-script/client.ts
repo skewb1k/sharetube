@@ -6,11 +6,6 @@ interface Room {
   users: User[];
 }
 
-interface JoinRoomResp {
-  user_id: number;
-  room: Room;
-}
-
 async function createRoom(): Promise<string> {
   const response = await fetch("$ST_HOST/room", {
     method: "POST",
@@ -19,15 +14,15 @@ async function createRoom(): Promise<string> {
   return roomId;
 }
 
-async function joinRoom(roomId: string): Promise<JoinRoomResp> {
+async function joinRoom(roomId: string): Promise<string> {
   const response = await fetch(`$ST_HOST/room/${roomId}`, {
     method: "POST",
   });
-  const body = await response.json();
-  return body;
+  const userId = await response.text();
+  return userId;
 }
 
-function connectRoom(userId: number, roomId: string) {
+function connectRoom(userId: string, roomId: string) {
   let ws = new WebSocket(
     `ws://localhost:9090/room/${roomId}/connect?uid=${userId}`,
   );

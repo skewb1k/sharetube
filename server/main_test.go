@@ -1,11 +1,11 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"maps"
 	"net/http"
+	"strconv"
 	"testing"
 	"time"
 
@@ -129,15 +129,15 @@ func joinRoom(client *http.Client, roomID string) (int, error) {
 		return 0, fmt.Errorf("unexpected status: %s", res.Status)
 	}
 
-	var resp struct {
-		UserID int `json:"user_id"`
-	}
-	err = json.NewDecoder(res.Body).Decode(&resp)
+	userIDBytes, err := io.ReadAll(res.Body)
 	if err != nil {
-		return 0, fmt.Errorf("decode body: %w", err)
+		return 0, fmt.Errorf("read body: %w", err)
 	}
-
-	return resp.UserID, nil
+	userID, err := strconv.Atoi(string(userIDBytes))
+	if err != nil {
+		return 0, fmt.Errorf("invalid user id: %w", err)
+	}
+	return userID, nil
 }
 
 func connect(roomID string, userID int) (*websocket.Conn, error) {
