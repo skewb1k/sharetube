@@ -12,7 +12,7 @@ function parseRoomURL(url: string): string | null {
 
 function setRoomURL(roomId: string): void {
   const newPath = `/sharetube/${roomId}`;
-  history.pushState({}, "", newPath);
+  history.replaceState(null, "", newPath);
   console.log("URL set to %s", newPath);
 }
 
