@@ -30,6 +30,8 @@ async function handleCreateRoom(): Promise<void> {
   localStorage.setItem(STORAGE_KEY_ROOM_ID, roomId);
   localStorage.setItem(STORAGE_KEY_USER_ID, userId);
 
+  // TODO(skewb1k): rename "Create Room" button.
+  injectAddVideoInput();
   connectRoom(userId, roomId);
 }
 
@@ -69,9 +71,37 @@ async function handleStoredRoomId(roomId: string): Promise<void> {
     );
     return;
   }
+  // TODO(skewb1k): YouTube can override URL back to '/', investigate how to listen for such event and keep url updated.
   setRoomURL(roomId);
   console.log("Fetched room info for %s: %o", roomId, room);
+  injectAddVideoInput();
   connectRoom(userId, roomId);
+}
+
+function injectCreateRoomButton(): void {
+  const createRoomButtonContainer = document.querySelector("#end");
+  if (createRoomButtonContainer === null) {
+    throw new Error("createRoom button container not found");
+  }
+  const createRoomButton = document.createElement("button");
+  createRoomButton.textContent = "Create Room";
+  createRoomButton.addEventListener("click", handleCreateRoom);
+  createRoomButtonContainer.prepend(createRoomButton);
+}
+
+function injectAddVideoInput(): void {
+  const ytSearchBox = document.querySelector("yt-searchbox");
+  if (ytSearchBox === null) {
+    throw new Error("yt-searchbox not found");
+  }
+  const addVideoInput = document.createElement("input");
+  addVideoInput.placeholder = "Add Video";
+  addVideoInput.addEventListener("keypress", function (ev) {
+    if (ev.key === "Enter") {
+      ev.preventDefault();
+    }
+  });
+  ytSearchBox.replaceWith(addVideoInput);
 }
 
 (async () => {
@@ -80,23 +110,14 @@ async function handleStoredRoomId(roomId: string): Promise<void> {
   if (roomId !== null) {
     console.log("Room URL detected, room ID: %s", roomId);
     handleRoomURL(roomId);
+    return;
   }
+
+  injectCreateRoomButton();
 
   const storedRoomId = localStorage.getItem(STORAGE_KEY_ROOM_ID);
   if (storedRoomId !== null) {
     console.log("Found stored room ID: %s", storedRoomId);
     handleStoredRoomId(storedRoomId);
   }
-
-  const createRoomButtonContainer = document.querySelector("#end");
-  if (createRoomButtonContainer === null) {
-    throw new Error("createRoom button container not found");
-  }
-
-  const createRoomButton = document.createElement("button");
-  createRoomButton.textContent = "Create Room";
-
-  createRoomButton.addEventListener("click", handleCreateRoom);
-
-  createRoomButtonContainer.prepend(createRoomButton);
 })();
