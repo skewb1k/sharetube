@@ -11,13 +11,13 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// TODO(skewb1k): choose the random available port instead.
+const HOST = "localhost:40000"
+
 func TestMain(m *testing.M) {
-	go main() // Start the server in-process
+	go ServeHTTP(HOST) // Start the server in-process
 	m.Run()
 }
-
-// TODO(skewb1k): choose the random available port instead.
-const HOST = "localhost:9090"
 
 func TestConnect(t *testing.T) {
 	var client http.Client
