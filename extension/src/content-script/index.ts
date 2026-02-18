@@ -32,7 +32,7 @@ async function handleCreateRoom(): Promise<void> {
 
   // TODO(skewb1k): rename "Create Room" button.
   injectAddVideoInput();
-  connectRoom(authToken);
+  subscribe(authToken);
 }
 
 async function handleRoomURL(roomId: string): Promise<void> {
@@ -76,7 +76,7 @@ async function handleStoredRoomId(roomId: string): Promise<void> {
   setRoomURL(roomId);
   console.log("Fetched room info for %s: %o", roomId, room);
   injectAddVideoInput();
-  connectRoom(authToken);
+  subscribe(authToken);
 }
 
 function injectCreateRoomButton(): void {

@@ -15,7 +15,23 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func handleConnectRoom(w http.ResponseWriter, r *http.Request) {
+type NotificationTag uint8
+
+const (
+	NotificationTagUserJoined NotificationTag = iota
+)
+
+type Notification struct {
+	Tag  NotificationTag `json:"tag"`
+	Data any             `json:"data"`
+}
+
+type UserJoinedNotification struct {
+	JoinedUser *User   `json:"joinedUser"`
+	Users      []*User `json:"users"`
+}
+
+func handleSubscribe(w http.ResponseWriter, r *http.Request) {
 	authTokenParam := r.URL.Query().Get("token")
 	authToken, err := DecodeAuthToken(authTokenParam)
 	if err != nil {
@@ -75,6 +91,7 @@ func handleConnectRoom(w http.ResponseWriter, r *http.Request) {
 
 // This function does not acquire or release the room lock.
 // Callers are responsible for locking.
+// TODO(skewb1k): rename.
 func broadcast(room *Room, senderConn *websocket.Conn, msg []byte) {
 	for _, user := range room.Users {
 		conn := user.Conn

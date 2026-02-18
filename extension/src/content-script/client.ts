@@ -37,11 +37,15 @@ async function joinRoom(roomId: string): Promise<string> {
   return authToken;
 }
 
-function connectRoom(authToken: string) {
-  let ws = new WebSocket(`ws://localhost:9090/connect?token=${authToken}`);
+function subscribe(authToken: string) {
+  let ws = new WebSocket(`ws://localhost:9090/subscribe?token=${authToken}`);
 
   ws.addEventListener("open", () => {
     console.log("Connection open");
+  });
+
+  ws.addEventListener("message", (ev) => {
+    console.log("New message", ev);
   });
 
   ws.addEventListener("close", (ev) => {

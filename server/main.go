@@ -11,7 +11,7 @@ func main() {
 	mux.HandleFunc("POST /room", handleCreateRoom)
 	mux.HandleFunc("GET /room/{roomID}", handleGetRoom)
 	mux.HandleFunc("POST /room/{roomID}", handleJoinRoom)
-	mux.HandleFunc("GET /connect", handleConnectRoom)
+	mux.HandleFunc("GET /subscribe", handleSubscribe)
 
 	srv := &http.Server{
 		Addr:    "0.0.0.0:9090",

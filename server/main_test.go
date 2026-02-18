@@ -37,9 +37,9 @@ func TestConnect(t *testing.T) {
 		t.Fatalf("joinRoom user1: %v", err)
 	}
 
-	conn1, err := connect(authToken1)
+	conn1, err := subscribe(authToken1)
 	if err != nil {
-		t.Fatalf("connect user1: %v", err)
+		t.Fatalf("subscribe user1: %v", err)
 	}
 	defer conn1.Close()
 
@@ -48,9 +48,9 @@ func TestConnect(t *testing.T) {
 		t.Fatalf("joinRoom user2: %v", err)
 	}
 
-	conn2, err := connect(authToken2)
+	conn2, err := subscribe(authToken2)
 	if err != nil {
-		t.Fatalf("connect user2: %v", err)
+		t.Fatalf("subscribe user2: %v", err)
 	}
 	defer conn2.Close()
 
@@ -134,8 +134,8 @@ func joinRoom(client *http.Client, roomID string) (string, error) {
 	return authToken, nil
 }
 
-func connect(authToken string) (*websocket.Conn, error) {
-	wsURL := fmt.Sprintf("ws://%s/connect?token=%s", HOST, authToken)
+func subscribe(authToken string) (*websocket.Conn, error) {
+	wsURL := fmt.Sprintf("ws://%s/subscribe?token=%s", HOST, authToken)
 	dialer := websocket.Dialer{}
 	conn, _, err := dialer.Dial(wsURL, nil)
 	if err != nil {
