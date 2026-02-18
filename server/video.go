@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+
+	"sharetube-server/ytinfo"
 )
 
 type AddVideoRequest struct {
@@ -37,9 +39,16 @@ func handleAddVideo(w http.ResponseWriter, r *http.Request) {
 
 	room.Mu.Lock()
 
+	videoInfo, err := ytinfo.FetchVideoInfo(req.YTID)
+	if err != nil {
+		http.Error(w, "Failed to fetch video info: "+err.Error(), http.StatusBadRequest)
+		return
+	}
 	video := &Video{
-		YTID: req.YTID,
-		// TODO(skewb1k): fetch other info about video.
+		YTID:         req.YTID,
+		Title:        videoInfo.Title,
+		AuthorName:   videoInfo.AuthorName,
+		ThumbnailURL: videoInfo.ThumbnailURL,
 	}
 	if room.Playlist.CurrentVideo == nil {
 		room.Playlist.CurrentVideo = video
