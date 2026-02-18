@@ -1,6 +1,8 @@
 const STORAGE_KEY_ROOM_ID = "st-room-id";
 const STORAGE_KEY_AUTH_TOKEN = "st-auth-token";
 
+let client: Client | undefined;
+
 function parseRoomURL(url: string): string | null {
   // TODO(skewb1k): consider validating roomId.
   const inviteMatch = url.match(/\/sharetube\/([^/?#]+)/);
@@ -32,7 +34,9 @@ async function handleCreateRoom(): Promise<void> {
 
   // TODO(skewb1k): rename "Create Room" button.
   injectAddVideoInput();
-  subscribe(authToken);
+
+  client = new Client(authToken);
+  client.subscribe();
 }
 
 async function handleRoomURL(roomId: string): Promise<void> {
@@ -62,6 +66,7 @@ async function handleStoredRoomId(roomId: string): Promise<void> {
   try {
     room = await getRoom(roomId);
   } catch (err) {
+    client = undefined;
     localStorage.removeItem(STORAGE_KEY_ROOM_ID);
     localStorage.removeItem(STORAGE_KEY_AUTH_TOKEN);
     console.log(
@@ -76,7 +81,9 @@ async function handleStoredRoomId(roomId: string): Promise<void> {
   setRoomURL(roomId);
   console.log("Fetched room info for %s: %o", roomId, room);
   injectAddVideoInput();
-  subscribe(authToken);
+
+  client = new Client(authToken);
+  client.subscribe();
 }
 
 function injectCreateRoomButton(): void {
@@ -97,9 +104,12 @@ function injectAddVideoInput(): void {
   }
   const addVideoInput = document.createElement("input");
   addVideoInput.placeholder = "Add Video";
-  addVideoInput.addEventListener("keypress", function (ev) {
+  addVideoInput.addEventListener("keypress", async (ev) => {
     if (ev.key === "Enter") {
       ev.preventDefault();
+      await client!.addVideo({
+        ytId: addVideoInput.value,
+      });
     }
   });
   ytSearchBox.replaceWith(addVideoInput);

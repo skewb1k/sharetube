@@ -19,6 +19,7 @@ type NotificationTag uint8
 
 const (
 	NotificationTagUserJoined NotificationTag = iota
+	NotificationTagVideoAdded
 )
 
 type Notification struct {

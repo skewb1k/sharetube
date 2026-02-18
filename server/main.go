@@ -8,9 +8,12 @@ import (
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", handleHealthz)
+
 	mux.HandleFunc("POST /room", handleCreateRoom)
 	mux.HandleFunc("GET /room/{roomID}", handleGetRoom)
 	mux.HandleFunc("POST /room/{roomID}", handleJoinRoom)
+
+	mux.HandleFunc("POST /video", handleAddVideo)
 	mux.HandleFunc("GET /subscribe", handleSubscribe)
 
 	srv := &http.Server{

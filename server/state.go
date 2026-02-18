@@ -11,9 +11,23 @@ type User struct {
 	Conn *websocket.Conn `json:"-"`
 }
 
+type Video struct {
+	YTID         string `json:"ytId"`
+	Title        string `json:"title"`
+	AuthorName   string `json:"authorName"`
+	ThumbnailURL string `json:"thumbnailUrl"`
+}
+
+type Playlist struct {
+	Videos        []*Video `json:"videos"`
+	PreviousVideo *Video   `json:"previousVideo"`
+	CurrentVideo  *Video   `json:"currentVideo"`
+}
+
 type Room struct {
-	Mu    sync.RWMutex
-	Users []*User `json:"users"`
+	Mu       sync.RWMutex
+	Users    []*User  `json:"users"`
+	Playlist Playlist `json:"playlist"`
 }
 
 func (r *Room) GetUser(userID int) *User {

@@ -6,6 +6,10 @@ interface Room {
   users: User[];
 }
 
+interface AddVideoRequest {
+  ytId: string;
+}
+
 async function createRoom(): Promise<string> {
   const response = await fetch("$ST_HOST/room", {
     method: "POST",
@@ -37,22 +41,47 @@ async function joinRoom(roomId: string): Promise<string> {
   return authToken;
 }
 
-function subscribe(authToken: string) {
-  let ws = new WebSocket(`ws://localhost:9090/subscribe?token=${authToken}`);
+class Client {
+  authToken: string;
 
-  ws.addEventListener("open", () => {
-    console.log("Connection open");
-  });
+  constructor(authToken: string) {
+    this.authToken = authToken;
+  }
 
-  ws.addEventListener("message", (ev) => {
-    console.log("New message", ev);
-  });
+  async addVideo(requestBody: AddVideoRequest): Promise<void> {
+    const response = await fetch(`$ST_HOST/video`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: this.authToken,
+      },
+      body: JSON.stringify(requestBody),
+    });
+    if (!response.ok) {
+      throw new Error(`Response status: ${response.status}`);
+    }
+  }
 
-  ws.addEventListener("close", (ev) => {
-    console.log("Connection closed");
-  });
+  subscribe() {
+    // TODO(skewb1k): un-hardcode host.
+    let ws = new WebSocket(
+      `ws://localhost:9090/subscribe?token=${this.authToken}`,
+    );
 
-  ws.addEventListener("error", (ev) => {
-    console.error("Connection error", ev);
-  });
+    ws.addEventListener("open", () => {
+      console.log("Connection open");
+    });
+
+    ws.addEventListener("message", (ev) => {
+      console.log("New message", ev.data);
+    });
+
+    ws.addEventListener("close", (ev) => {
+      console.log("Connection closed");
+    });
+
+    ws.addEventListener("error", (ev) => {
+      console.error("Connection error", ev);
+    });
+  }
 }
