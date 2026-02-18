@@ -33,14 +33,12 @@ async function joinRoom(roomId: string): Promise<string> {
   if (!response.ok) {
     throw new Error(`Response status: ${response.status}`);
   }
-  const userId = await response.text();
-  return userId;
+  const authToken = await response.text();
+  return authToken;
 }
 
-function connectRoom(userId: string, roomId: string) {
-  let ws = new WebSocket(
-    `ws://localhost:9090/room/${roomId}/connect?uid=${userId}`,
-  );
+function connectRoom(authToken: string) {
+  let ws = new WebSocket(`ws://localhost:9090/connect?token=${authToken}`);
 
   ws.addEventListener("open", () => {
     console.log("Connection open");

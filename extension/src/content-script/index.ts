@@ -1,5 +1,5 @@
 const STORAGE_KEY_ROOM_ID = "st-room-id";
-const STORAGE_KEY_USER_ID = "st-user-id";
+const STORAGE_KEY_AUTH_TOKEN = "st-auth-token";
 
 function parseRoomURL(url: string): string | null {
   // TODO(skewb1k): consider validating roomId.
@@ -26,36 +26,36 @@ async function handleCreateRoom(): Promise<void> {
   const roomId = await createRoom();
   setRoomURL(roomId);
 
-  const userId = await joinRoom(roomId);
+  const authToken = await joinRoom(roomId);
   localStorage.setItem(STORAGE_KEY_ROOM_ID, roomId);
-  localStorage.setItem(STORAGE_KEY_USER_ID, userId);
+  localStorage.setItem(STORAGE_KEY_AUTH_TOKEN, authToken);
 
   // TODO(skewb1k): rename "Create Room" button.
   injectAddVideoInput();
-  connectRoom(userId, roomId);
+  connectRoom(authToken);
 }
 
 async function handleRoomURL(roomId: string): Promise<void> {
-  let userId: string;
+  let authToken: string;
   try {
-    userId = await joinRoom(roomId);
+    authToken = await joinRoom(roomId);
   } catch (err) {
     // TODO(skewb1k): display "Room Not Found" in case of error.
     console.error("Failed to join room:", err);
     return;
   }
-  console.log("Joined room %s with userid %s", roomId, userId);
+  console.log("Joined room %s", roomId);
 
   localStorage.setItem(STORAGE_KEY_ROOM_ID, roomId);
-  localStorage.setItem(STORAGE_KEY_USER_ID, userId);
+  localStorage.setItem(STORAGE_KEY_AUTH_TOKEN, authToken);
   // TODO(skewb1k): open current video URL if present.
   window.location.href = "/";
 }
 
 async function handleStoredRoomId(roomId: string): Promise<void> {
-  const userId = localStorage.getItem(STORAGE_KEY_USER_ID);
-  if (userId === null) {
-    throw new Error("Found stored room ID but missing corresponding user ID");
+  const authToken = localStorage.getItem(STORAGE_KEY_AUTH_TOKEN);
+  if (authToken === null) {
+    throw new Error("Found stored room ID but missing auth token");
   }
 
   let room: Room;
@@ -63,7 +63,7 @@ async function handleStoredRoomId(roomId: string): Promise<void> {
     room = await getRoom(roomId);
   } catch (err) {
     localStorage.removeItem(STORAGE_KEY_ROOM_ID);
-    localStorage.removeItem(STORAGE_KEY_USER_ID);
+    localStorage.removeItem(STORAGE_KEY_AUTH_TOKEN);
     console.log(
       "Failed to get room for stored ID %s; storage cleaned: %o",
       roomId,
@@ -71,11 +71,12 @@ async function handleStoredRoomId(roomId: string): Promise<void> {
     );
     return;
   }
-  // TODO(skewb1k): YouTube can override URL back to '/', investigate how to listen for such event and keep url updated.
+  // TODO(skewb1k): YouTube can override URL back to '/', investigate how to
+  // listen for such event and keep url updated.
   setRoomURL(roomId);
   console.log("Fetched room info for %s: %o", roomId, room);
   injectAddVideoInput();
-  connectRoom(userId, roomId);
+  connectRoom(authToken);
 }
 
 function injectCreateRoomButton(): void {

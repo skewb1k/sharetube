@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"strconv"
 )
 
 var roomStore = NewRoomStore()
@@ -51,6 +50,7 @@ func handleJoinRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO(skewb1k): use request body instead.
 	username := r.URL.Query().Get("username")
 	if username == "" {
 		// TODO(skewb1k): generate unique username.
@@ -74,6 +74,7 @@ func handleJoinRoom(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+	// TODO(skewb1k): do not block handler by broadcasting.
 	broadcast(room, nil, notificationBytes)
 	room.Mu.RUnlock()
 
@@ -82,5 +83,9 @@ func handleJoinRoom(w http.ResponseWriter, r *http.Request) {
 	room.Users = append(room.Users, user)
 	room.Mu.Unlock()
 
-	_, _ = io.WriteString(w, strconv.Itoa(userID))
+	authToken := AuthToken{
+		RoomID: roomID,
+		UserID: userID,
+	}
+	_, _ = io.WriteString(w, authToken.String())
 }

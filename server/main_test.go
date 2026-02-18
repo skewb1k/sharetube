@@ -5,7 +5,6 @@ import (
 	"io"
 	"maps"
 	"net/http"
-	"strconv"
 	"testing"
 	"time"
 
@@ -33,23 +32,23 @@ func TestConnect(t *testing.T) {
 		t.Fatalf("getRoom: %v", err)
 	}
 
-	userID1, err := joinRoom(&client, roomID)
+	authToken1, err := joinRoom(&client, roomID)
 	if err != nil {
 		t.Fatalf("joinRoom user1: %v", err)
 	}
 
-	conn1, err := connect(roomID, userID1)
+	conn1, err := connect(authToken1)
 	if err != nil {
 		t.Fatalf("connect user1: %v", err)
 	}
 	defer conn1.Close()
 
-	userID2, err := joinRoom(&client, roomID)
+	authToken2, err := joinRoom(&client, roomID)
 	if err != nil {
 		t.Fatalf("joinRoom user2: %v", err)
 	}
 
-	conn2, err := connect(roomID, userID2)
+	conn2, err := connect(authToken2)
 	if err != nil {
 		t.Fatalf("connect user2: %v", err)
 	}
@@ -111,37 +110,32 @@ func createRoom(client *http.Client) (string, error) {
 	return string(roomIDBytes), nil
 }
 
-func joinRoom(client *http.Client, roomID string) (int, error) {
+func joinRoom(client *http.Client, roomID string) (string, error) {
 	url := "http://" + HOST + "/room/" + roomID
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
-		return 0, fmt.Errorf("request build: %w", err)
+		return "", fmt.Errorf("request build: %w", err)
 	}
 	res, err := client.Do(req)
 	if err != nil {
-		return 0, fmt.Errorf("request do: %w", err)
+		return "", fmt.Errorf("request do: %w", err)
 	}
 	defer res.Body.Close()
 
-	// TODO(skewb1k): assert res.Body.
-
 	if res.StatusCode != http.StatusOK {
-		return 0, fmt.Errorf("unexpected status: %s", res.Status)
+		return "", fmt.Errorf("unexpected status: %s", res.Status)
 	}
 
-	userIDBytes, err := io.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return 0, fmt.Errorf("read body: %w", err)
+		return "", fmt.Errorf("read body: %w", err)
 	}
-	userID, err := strconv.Atoi(string(userIDBytes))
-	if err != nil {
-		return 0, fmt.Errorf("invalid user id: %w", err)
-	}
-	return userID, nil
+	authToken := string(body)
+	return authToken, nil
 }
 
-func connect(roomID string, userID int) (*websocket.Conn, error) {
-	wsURL := fmt.Sprintf("ws://%s/room/%s/connect?uid=%d", HOST, roomID, userID)
+func connect(authToken string) (*websocket.Conn, error) {
+	wsURL := fmt.Sprintf("ws://%s/connect?token=%s", HOST, authToken)
 	dialer := websocket.Dialer{}
 	conn, _, err := dialer.Dial(wsURL, nil)
 	if err != nil {

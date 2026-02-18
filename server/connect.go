@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/websocket"
 )
@@ -17,21 +16,20 @@ var upgrader = websocket.Upgrader{
 }
 
 func handleConnectRoom(w http.ResponseWriter, r *http.Request) {
-	roomID := r.PathValue("roomID")
-	room := roomStore.GetRoom(roomID)
+	authTokenParam := r.URL.Query().Get("token")
+	authToken, err := DecodeAuthToken(authTokenParam)
+	if err != nil {
+		http.Error(w, "Invalid auth token: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	room := roomStore.GetRoom(authToken.RoomID)
 	if room == nil {
 		http.Error(w, "Room not found", http.StatusNotFound)
 		return
 	}
 
-	userIDParam := r.URL.Query().Get("uid")
-	userID, err := strconv.Atoi(userIDParam)
-	if err != nil {
-		http.Error(w, "Invalid user ID: "+err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	user := room.GetUser(userID)
+	user := room.GetUser(authToken.UserID)
 	if user == nil {
 		http.Error(w, "User not found", http.StatusBadRequest)
 		return
