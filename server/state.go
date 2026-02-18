@@ -25,9 +25,9 @@ type Playlist struct {
 }
 
 type Room struct {
-	Mu       sync.RWMutex
-	Users    []*User  `json:"users"`
-	Playlist Playlist `json:"playlist"`
+	Mu       sync.RWMutex `json:"-"`
+	Users    []*User      `json:"users"`
+	Playlist Playlist     `json:"playlist"`
 }
 
 func (r *Room) GetUser(userID int) *User {

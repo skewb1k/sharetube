@@ -20,7 +20,12 @@ func newRoomID() string {
 func handleCreateRoom(w http.ResponseWriter, r *http.Request) {
 	roomID := newRoomID()
 
-	room := &Room{}
+	room := &Room{
+		Playlist: Playlist{
+			// Initialize slice so its encoded as [] in JSON.
+			Videos: make([]*Video, 0),
+		},
+	}
 	roomStore.AddRoom(roomID, room)
 
 	w.WriteHeader(http.StatusCreated)
