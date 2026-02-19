@@ -15,11 +15,11 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-type NotificationTag uint8
+type NotificationTag string
 
 const (
-	NotificationTagUserJoined NotificationTag = iota
-	NotificationTagVideoAdded
+	NotificationTagUserJoined NotificationTag = "USER_JOINED"
+	NotificationTagVideoAdded                 = "VIDEO_ADDED"
 )
 
 type Notification struct {
