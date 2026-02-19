@@ -52,6 +52,7 @@ func handleAddVideo(w http.ResponseWriter, r *http.Request) {
 		AuthorName:   videoInfo.AuthorName,
 		ThumbnailURL: videoInfo.ThumbnailURL,
 	}
+
 	if room.Playlist.CurrentVideo == nil {
 		room.Playlist.CurrentVideo = video
 	} else {
@@ -88,25 +89,28 @@ func handleRemoveVideo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	videoID, err := strconv.Atoi(r.PathValue("videoID"))
+	videoIdx, err := strconv.Atoi(r.PathValue("videoIdx"))
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Invalid video id: %s", err), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Invalid video index: %s", err), http.StatusBadRequest)
 		return
 	}
 
 	room.Mu.Lock()
 
-	if videoID < 0 || videoID >= len(room.Playlist.Videos) {
+	if videoIdx < 0 || videoIdx >= len(room.Playlist.Videos) {
 		room.Mu.Unlock()
-		http.Error(w, "Invalid video id: index out of range", http.StatusBadRequest)
+		http.Error(w, "Invalid video index: out of range", http.StatusBadRequest)
 		return
 	}
 
-	room.Playlist.Videos = append(room.Playlist.Videos[:videoID], room.Playlist.Videos[videoID+1:]...)
+	room.Playlist.Videos = append(room.Playlist.Videos[:videoIdx], room.Playlist.Videos[videoIdx+1:]...)
 
 	notification := Notification{
-		Tag:  NotificationTagVideoRemoved,
-		Data: &room.Playlist,
+		Tag: NotificationTagVideoRemoved,
+		Data: VideoRemovedNotification{
+			RemovedVideoIdx: videoIdx,
+			Playlist:        &room.Playlist,
+		},
 	}
 	notificationMsg, err := json.Marshal(notification)
 	if err != nil {

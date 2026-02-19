@@ -16,7 +16,7 @@ func ServeHTTP(addr string) error {
 	mux.HandleFunc("POST /room/{roomID}", handleJoinRoom)
 
 	mux.HandleFunc("POST /video", handleAddVideo)
-	mux.HandleFunc("DELETE /video/{videoID}", handleRemoveVideo)
+	mux.HandleFunc("DELETE /video/{videoIdx}", handleRemoveVideo)
 	mux.HandleFunc("GET /subscribe", handleSubscribe)
 
 	srv := &http.Server{

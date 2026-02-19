@@ -27,8 +27,8 @@ type UserJoinedNotification struct {
 }
 
 type VideoRemovedNotification struct {
-	RemovedVideoID int       `json:"removedVideoId"`
-	Playlist       *Playlist `json:"playlist"`
+	RemovedVideoIdx int       `json:"removedVideoIdx"`
+	Playlist        *Playlist `json:"playlist"`
 }
 
 var upgrader = websocket.Upgrader{
