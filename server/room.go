@@ -64,7 +64,7 @@ func handleJoinRoom(w http.ResponseWriter, r *http.Request) {
 	var req JoinRoomRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		http.Error(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Invalid request body: %s", err), http.StatusBadRequest)
 		return
 	}
 

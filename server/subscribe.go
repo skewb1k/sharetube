@@ -1,18 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/websocket"
 )
-
-var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		// TODO(skewb1k): validate Origin.
-		return true
-	},
-}
 
 type NotificationTag string
 
@@ -31,11 +25,18 @@ type UserJoinedNotification struct {
 	Users      []*User `json:"users"`
 }
 
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		// TODO(skewb1k): validate Origin.
+		return true
+	},
+}
+
 func handleSubscribe(w http.ResponseWriter, r *http.Request) {
 	authTokenParam := r.URL.Query().Get("token")
 	authToken, err := DecodeAuthToken(authTokenParam)
 	if err != nil {
-		http.Error(w, "Invalid auth token: "+err.Error(), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Invalid auth token: %s", err), http.StatusBadRequest)
 		return
 	}
 
@@ -53,7 +54,7 @@ func handleSubscribe(w http.ResponseWriter, r *http.Request) {
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		http.Error(w, "Failed to upgrade connection: "+err.Error(), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Failed to upgrade connection: %s", err), http.StatusBadRequest)
 		return
 	}
 

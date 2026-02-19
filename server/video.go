@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"sharetube-server/ytinfo"
@@ -15,7 +16,7 @@ func handleAddVideo(w http.ResponseWriter, r *http.Request) {
 	authHeader := r.Header.Get("Authorization")
 	authToken, err := DecodeAuthToken(authHeader)
 	if err != nil {
-		http.Error(w, "Invalid auth token: "+err.Error(), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Invalid auth token: %s", err), http.StatusBadRequest)
 		return
 	}
 
@@ -33,7 +34,7 @@ func handleAddVideo(w http.ResponseWriter, r *http.Request) {
 
 	var req AddVideoRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Invalid request body: %s", err), http.StatusBadRequest)
 		return
 	}
 
@@ -41,7 +42,7 @@ func handleAddVideo(w http.ResponseWriter, r *http.Request) {
 
 	videoInfo, err := ytinfo.FetchVideoInfo(req.YTID)
 	if err != nil {
-		http.Error(w, "Failed to fetch video info: "+err.Error(), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Failed to fetch video info: %s", err), http.StatusBadRequest)
 		return
 	}
 	video := &Video{
