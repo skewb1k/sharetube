@@ -11,8 +11,9 @@ import (
 type NotificationTag string
 
 const (
-	NotificationTagUserJoined NotificationTag = "USER_JOINED"
-	NotificationTagVideoAdded                 = "VIDEO_ADDED"
+	NotificationTagUserJoined   NotificationTag = "USER_JOINED"
+	NotificationTagVideoAdded                   = "VIDEO_ADDED"
+	NotificationTagVideoRemoved                 = "VIDEO_REMOVED"
 )
 
 type Notification struct {
@@ -23,6 +24,11 @@ type Notification struct {
 type UserJoinedNotification struct {
 	JoinedUser *User   `json:"joinedUser"`
 	Users      []*User `json:"users"`
+}
+
+type VideoRemovedNotification struct {
+	RemovedVideoID int       `json:"removedVideoId"`
+	Playlist       *Playlist `json:"playlist"`
 }
 
 var upgrader = websocket.Upgrader{
