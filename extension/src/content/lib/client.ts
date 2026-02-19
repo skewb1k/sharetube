@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
 import { injectVideoInput } from "../video-input";
+import { navigateToVideo } from "./navigateToVideo";
 
 const host = import.meta.env.VITE_ST_HOST || "http://localhost:9090";
 export const STORAGE_KEY_ROOM_ID = "st-room-id";
@@ -88,6 +89,9 @@ export class Client {
 
     ws.addEventListener("message", (ev) => {
       console.log("New message", ev.data);
+      const d = JSON.parse(ev.data)
+      console.log("New message json", d);
+      navigateToVideo(d.data.currentVideo.ytId);
     });
 
     ws.addEventListener("close", () => {
