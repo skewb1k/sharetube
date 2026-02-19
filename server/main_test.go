@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"maps"
@@ -111,11 +112,14 @@ func createRoom(client *http.Client) (string, error) {
 }
 
 func joinRoom(client *http.Client, roomID string) (string, error) {
+	reqBody := `{"username":"test"}`
 	url := "http://" + HOST + "/room/" + roomID
-	req, err := http.NewRequest("POST", url, nil)
+	req, err := http.NewRequest("POST", url, bytes.NewBufferString(reqBody))
 	if err != nil {
 		return "", fmt.Errorf("request build: %w", err)
 	}
+	req.Header.Set("Content-Type", "application/json")
+
 	res, err := client.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("request do: %w", err)

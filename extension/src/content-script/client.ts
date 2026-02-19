@@ -33,6 +33,11 @@ async function getRoom(roomId: string): Promise<Room> {
 async function joinRoom(roomId: string): Promise<string> {
   const response = await fetch(`$ST_HOST/room/${roomId}`, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    // TODO(skewb1k): support providing params.
+    body: "{}",
   });
   if (!response.ok) {
     throw new Error(`Response status: ${response.status}`);

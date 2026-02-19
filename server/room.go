@@ -47,6 +47,10 @@ func handleGetRoom(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type JoinRoomRequest struct {
+	Username string `json:"username"`
+}
+
 func handleJoinRoom(w http.ResponseWriter, r *http.Request) {
 	roomID := r.PathValue("roomID")
 	room := roomStore.GetRoom(roomID)
@@ -55,15 +59,21 @@ func handleJoinRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO(skewb1k): use request body instead.
-	username := r.URL.Query().Get("username")
-	if username == "" {
+	// TODO(skewb1k): consider allowing omit request body completely.
+	var req JoinRoomRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if req.Username == "" {
 		// TODO(skewb1k): generate unique username.
-		username = "User1"
+		req.Username = "User1"
 	}
 
 	user := &User{
-		Name: username,
+		Name: req.Username,
 	}
 
 	room.Mu.RLock()
