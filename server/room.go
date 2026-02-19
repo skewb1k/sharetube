@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 )
@@ -67,16 +68,15 @@ func handleJoinRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	room.Mu.RLock()
+
 	if req.Username == "" {
-		// TODO(skewb1k): generate unique username.
-		req.Username = "User1"
+		req.Username = fmt.Sprintf("User %d", len(room.Users)+1)
 	}
 
 	user := &User{
 		Name: req.Username,
 	}
-
-	room.Mu.RLock()
 
 	notification := &Notification{
 		Tag: NotificationTagUserJoined,
