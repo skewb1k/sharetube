@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
@@ -57,36 +56,9 @@ func handleSubscribe(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to upgrade connection: "+err.Error(), http.StatusBadRequest)
 		return
 	}
-	defer conn.Close()
 
 	room.Mu.Lock()
 	user.Conn = conn
-	room.Mu.Unlock()
-
-	for {
-		var msg any
-		err := conn.ReadJSON(&msg)
-		if err != nil {
-			break
-		}
-		msgBytes, err := json.Marshal(msg)
-		if err != nil {
-			break
-		}
-
-		room.Mu.RLock()
-		broadcast(room, conn, msgBytes)
-		room.Mu.RUnlock()
-
-		err = conn.WriteMessage(websocket.TextMessage, msgBytes)
-		if err != nil {
-			log.Printf("Failed to write: %s", err.Error())
-			break
-		}
-	}
-
-	room.Mu.Lock()
-	user.Conn = nil
 	room.Mu.Unlock()
 }
 

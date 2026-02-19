@@ -4,10 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"maps"
 	"net/http"
 	"testing"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -54,38 +52,6 @@ func TestConnect(t *testing.T) {
 		t.Fatalf("subscribe user2: %v", err)
 	}
 	defer conn2.Close()
-
-	recvCh := make(chan any, 1)
-	errCh := make(chan error, 1)
-
-	go func() {
-		var v any
-		if err := conn2.ReadJSON(&v); err != nil {
-			errCh <- err
-			return
-		}
-		recvCh <- v
-	}()
-
-	msg := map[string]any{"data": "123"}
-	if err := conn1.WriteJSON(msg); err != nil {
-		t.Fatalf("write json on conn1: %v", err)
-	}
-
-	select {
-	case got := <-recvCh:
-		m, ok := got.(map[string]any)
-		if !ok {
-			t.Fatalf("received message has unexpected type: %T", got)
-		}
-		if !maps.Equal(msg, m) {
-			t.Fatalf("unexpected message data: %#v", m)
-		}
-	case err := <-errCh:
-		t.Fatalf("conn2 read failed: %v", err)
-	case <-time.After(2 * time.Second):
-		t.Fatalf("timed out waiting for message on conn2")
-	}
 }
 
 func createRoom(client *http.Client) (string, error) {
