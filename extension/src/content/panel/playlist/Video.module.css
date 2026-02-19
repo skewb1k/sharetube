@@ -1,0 +1,129 @@
+.video {
+  display: flex;
+  align-items: stretch;
+  padding: 4px 8px 4px 0;
+  user-select: none;
+
+  &:hover {
+    background-color: var(--yt-spec-additive-background);
+    cursor: pointer;
+  }
+
+  &[data-type="current"] {
+    background-color: var(--yt-spec-additive-background);
+  }
+
+  &[data-type="previous"] {
+    & .middle {
+      opacity: 0.5;
+    }
+    & .thumbnail {
+      opacity: 0.5;
+    }
+  }
+}
+
+.thumbnail {
+  height: 56px;
+  width: 100px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.left {
+  width: 24px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--st-text-secondary);
+}
+
+.left__play {
+  display: none;
+}
+
+.video[data-type="current"] .left__play {
+  display: inline-block;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: 1.5rem;
+}
+
+.left__handle {
+  display: none;
+}
+
+.video[data-type="common"]:hover .left__handle {
+  display: block;
+}
+
+.middle {
+  padding: 0 8px;
+}
+
+.title {
+  margin: 0 0 4px 0;
+  font-family: var(--st-font-family-secondary);
+  font-size: 1.4rem;
+  line-height: 2rem;
+  font-weight: 500;
+  flex-shrink: 1;
+  overflow: hidden;
+  display: block;
+  max-height: 4rem;
+  line-clamp: 2;
+  display: box;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  white-space: normal;
+  color: var(--st-text-primary);
+}
+
+.channel {
+  font-family: var(--st-font-family-secondary);
+  font-size: 1.2rem;
+  line-height: 1.8rem;
+  max-height: 1.8rem;
+  font-weight: 400;
+  line-clamp: 1;
+  overflow: hidden;
+  user-select: none;
+  color: var(--st-text-secondary);
+}
+
+.right {
+  display: flex;
+  flex-shrink: 0;
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  margin: 0 0 0 auto;
+}
+
+.video[data-type="common"]:hover .right__delete {
+  --size: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  background: none;
+  height: var(--size);
+  width: var(--size);
+  border-radius: var(--size);
+  color: var(--st-text-secondary);
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.right__delete {
+  display: none;
+}

@@ -1,0 +1,13 @@
+:root {
+  --st-background-primary: var(--yt-spec-base-background);
+  --st-background-secondary: var(--yt-spec-raised-background);
+  --st-background-tertiary: rgba(255, 255, 255, 0.2);
+
+  --st-font-family-primary: "YouTube Sans", "Roboto", sans-serif;
+  --st-font-family-secondary: "Roboto", "Arial", sans-serif;
+
+  --st-text-primary: var(--yt-spec-text-primary);
+  --st-text-secondary: var(--yt-spec-text-secondary);
+
+  --st-outline-primary: var(--yt-spec-outline) 1px solid;
+}

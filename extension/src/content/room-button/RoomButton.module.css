@@ -1,0 +1,32 @@
+.create {
+  --height: 36px;
+
+  height: var(--height);
+  border-radius: var(--height);
+  border: none;
+  padding: 0 16px;
+  margin: 0 8px;
+  color: var(--st-text-primary);
+  background-color: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    background-color: var(--st-background-tertiary);
+    cursor: pointer;
+  }
+}
+
+.create__icon {
+  margin: 0 6px 0 -6px;
+}
+
+.create__title {
+  padding: 0;
+  margin: 0;
+  white-space: nowrap;
+  font-family: var(--st-font-family-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 36px;
+}
