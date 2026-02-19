@@ -2,6 +2,7 @@ package main
 
 import (
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -24,10 +25,18 @@ type Playlist struct {
 	CurrentVideo  *Video   `json:"currentVideo"`
 }
 
+type Player struct {
+	CurrentTime  int       `json:"currentTime"`
+	Paused       bool      `json:"paused"`
+	PlaybackRate float64   `json:"playbackRate"`
+	UpdatedAt    time.Time `json:"updatedAt"`
+}
+
 type Room struct {
 	Mu       sync.RWMutex `json:"-"`
 	Users    []*User      `json:"users"`
 	Playlist Playlist     `json:"playlist"`
+	Player   Player       `json:"player"`
 }
 
 func (r *Room) GetUser(userID int) *User {
