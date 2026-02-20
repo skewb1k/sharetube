@@ -11,7 +11,7 @@ export default defineManifest({
   permissions: [],
   content_scripts: [
     {
-      js: ["src/content/index.tsx"],
+      js: ["src/content/index.ts"],
       matches: ["https://*.youtube.com/*"],
     },
   ],

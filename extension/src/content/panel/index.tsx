@@ -1,6 +1,6 @@
 import { Panel } from "./Panel";
-import { waitElement } from "../lib/waitElement";
 import { render } from "solid-js/web";
+import { waitElement } from "../lib/waitElement";
 
 export function injectPanel() {
   waitElement("#secondary-inner").then((e) => {

@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 import style from "./VideoInput.module.css";
-import { getIdFromUrl } from "./getIdFromUrl";
+import { parseVideoUrl } from "./parseVideoUrl";
 import { client } from "../lib/client";
 
 export function VideoInput() {
@@ -9,10 +9,12 @@ export function VideoInput() {
   const submit = (e: Event) => {
     e.preventDefault();
 
-    const ytId = getIdFromUrl(value());
-    if (!ytId) return;
+    const ytId = parseVideoUrl(value());
+    if (!ytId) {
+      return;
+    }
 
-    client()?.addVideo({ ytId });
+    client()!.addVideo({ ytId });
     setValue("");
   };
 
